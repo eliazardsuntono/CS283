@@ -1,1 +1,0 @@
-print("Buffer:  [Lets get a lot of words to test...................]" == "Buffer:  [Lets get a lot of words to test...................]")
