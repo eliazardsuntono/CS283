@@ -18,6 +18,7 @@ int print_words(char *, int, int);
 
 
 int setup_buff(char *buff, char *user_str, int len){
+    //TODO: #4:  Implement the setup buff as per the directions
     // -2 return code to check if user_str is null or is an empty string
     if (user_str == NULL) {
         return -2;
@@ -272,4 +273,6 @@ int main(int argc, char *argv[]){
 //          is a good practice, after all we know from main() that 
 //          the buff variable will have exactly 50 bytes?
 //  
-//          PLACE YOUR ANSWER HERE
+//          Buffer overflow prevention is accounted for when having an explicit buffer parameter. 
+//          This allows for developers to not accidentally write beyond array bounds.
+//          It is also good for code reusability as it taks away any hard-coded assumptions about the buffer.
