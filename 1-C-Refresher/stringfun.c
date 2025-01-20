@@ -236,7 +236,7 @@ int main(int argc, char *argv[]){
             rc = count_words(buff, BUFFER_SZ, user_str_len);  //you need to implement
             if (rc < 0){
                 printf("Error counting words, rc = %d\n", rc);
-                exit(2);
+                exit(3);
             }
             printf("Word Count: %d\n", rc);
             break;
@@ -246,14 +246,14 @@ int main(int argc, char *argv[]){
             rc = reverse_string(buff, BUFFER_SZ, user_str_len);
             if (rc < 0) {
                 printf("Error reversing string, rc = %d\n", rc);
-                exit(2);
+                exit(3);
             }
             break;
         case 'w':
             rc = print_words(buff, BUFFER_SZ, user_str_len);
             if (rc < 0) {
                 printf("Error printing words, rc = %d\n", rc);
-                exit(2);
+                exit(3);
             }
             break;
         default:
@@ -276,3 +276,6 @@ int main(int argc, char *argv[]){
 //          Buffer overflow prevention is accounted for when having an explicit buffer parameter. 
 //          This allows for developers to not accidentally write beyond array bounds.
 //          It is also good for code reusability as it taks away any hard-coded assumptions about the buffer.
+//          
+//          Also as a programmer, it allows me to understand the codebase easily as the hardcoded space would allow
+//          me to visualize memory easily and handle error codes if necessary
