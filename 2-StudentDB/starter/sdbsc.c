@@ -79,6 +79,7 @@ int get_student(int fd, int id, student_t *s)
     }
 
     return NO_ERROR;
+    
 }
 
 /*
@@ -364,9 +365,9 @@ void print_student(student_t *s)
         printf(M_ERR_STD_PRINT);
         return;
     }
-    float gpa = ((float)s->gpa) / 100.0;
+    float gpa_val = s->gpa / 100.0;
     printf(STUDENT_PRINT_HDR_STRING, "ID", "FIRST_NAME", "LAST_NAME", "GPA");
-    printf(STUDENT_PRINT_FMT_STRING, s->id, s->fname, s->lname, gpa);
+    printf(STUDENT_PRINT_FMT_STRING, s->id, s->fname, s->lname, gpa_val);
 }
 
 /*
@@ -419,8 +420,51 @@ void print_student(student_t *s)
  */
 int compress_db(int fd)
 {
-    // TODO
-    printf(M_NOT_IMPL);
+    // Create temporary file
+    int tmp_fd = open_db(TMP_DB_FILE, true);
+    if (tmp_fd < 0) {
+        printf(M_ERR_DB_OPEN);
+        return ERR_DB_FILE;
+    }
+
+    // Copy valid records to temporary file
+    for (int id = MIN_STD_ID; id <= MAX_STD_ID; id++) {
+        student_t s;
+        int rc = get_student(fd, id, &s);
+        
+        if (rc == NO_ERROR) {
+            // Valid student found, write to temp file
+            int writeRC = write(tmp_fd, &s, STUDENT_RECORD_SIZE);
+            if (writeRC != STUDENT_RECORD_SIZE) {
+                printf(M_ERR_DB_WRITE);
+                close(tmp_fd);
+                return ERR_DB_FILE;
+            }
+        } else if (rc == ERR_DB_FILE) {
+            printf(M_ERR_DB_READ);
+            close(tmp_fd);
+            return ERR_DB_FILE;
+        }
+    }
+
+    // Close both files
+    close(fd);
+    close(tmp_fd);
+
+    // Replace original file with temporary file
+    if (rename(TMP_DB_FILE, DB_FILE) != 0) {
+        printf(M_ERR_DB_CREATE);
+        return ERR_DB_FILE;
+    }
+
+    // Reopen the compressed file
+    fd = open_db(DB_FILE, false);
+    if (fd < 0) {
+        printf(M_ERR_DB_OPEN);
+        return ERR_DB_FILE;
+    }
+
+    printf(M_DB_COMPRESSED_OK);
     return fd;
 }
 

@@ -186,7 +186,6 @@ setup_file() {
 }
 
 @test "Compress db again - try 2" {
-    skip
     run ./sdbsc -x
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Database successfully compressed!" ] || {
