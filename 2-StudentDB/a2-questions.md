@@ -102,11 +102,11 @@ Please answer the following questions and submit in your repo for the second ass
 
     - Please explain why the file size reported by the `ls` command was 128 bytes after adding student with ID=1, 256 after adding student with ID=3, and 4160 after adding the student with ID=64? 
 
-        > **ANSWER:** The file size reported by `ls` only gives the highest offset. So essentially the math would look something like 65 * 64 = 4160 bytes, it does not actually account for the holes of data where space is not overwritten in the database.
+        > **ANSWER:** The file size reported by `ls` reflects the highest offset in the file. When adding student records, the size grows based on the ID position: ID=1 requires 2 records (128 bytes), ID=3 needs 4 records (256 bytes), and ID=64 needs 65 records (4160 bytes). This occurs because the database allocates space sequentially, including empty slots between records.
 
     - Why did the total storage used on the disk remain unchanged when we added the student with ID=1, ID=3, and ID=63, but increased from 4K to 8K when we added the student with ID=64? 
 
-        > **ANSWER:** Linux file systems typically use 4KB blocks as the minimum allocation unit. The first 63 records (63 * 64 = 4032 bytes) fit within one 4KB block. When student ID=64 was added, the total data exceeded 4KB, requiring a second block allocation, thus increasing the actual disk usage from 4K to 8K as reported by `du`.
+        > **ANSWER:** The disk usage remained unchanged for ID=1, ID=3, and ID=63 as they all fit within one 4KB block (Linux's minimum allocation unit). When ID=64 was added, the total data size (64 * 64 = 4096 bytes) exceeded the 4KB block, requiring a second block allocation, thus increasing the disk usage from 4K to 8K as shown by `du`.
 
     - Now lets add one more student with a large student ID number  and see what happens:
 
@@ -117,6 +117,7 @@ Please answer the following questions and submit in your repo for the second ass
         > du -h ./student.db
         12K     ./student.db
         ```
+
         We see from above adding a student with a very large student ID (ID=99999) increased the file size to 6400000 as shown by `ls` but the raw storage only increased to 12K as reported by `du`.  Can provide some insight into why this happened?
 
-        > **ANSWER:** `ls` only accounts for the hypothetical size of the file not the actual size. `ls` only shows the logical size of the file (10000 * 64), since theWhereas `du` the actual files written to disc. There are holes in the file as not every piece of the file does not have data written in it so the total amount of data inside the database is just 12K bytes.  
+        > **ANSWER:** When storing data at ID=99999, the file size reported by `ls` shows 6400000 bytes (100000 * 64) as it represents the highest offset. However, the actual disk usage (`du`) only shows 12K because Linux uses sparse files, storing only the blocks containing actual data. Since only a few records exist with large gaps between them, only three 4KB blocks are needed for the actual data storage, resulting in 12K total disk usage.
